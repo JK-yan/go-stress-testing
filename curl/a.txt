@@ -1,0 +1,6 @@
+curl --location --request POST 'https://iam-02.rcrai.com/v1/token' \
+--header 'Content-Type: application/json' \
+--data-raw '
+{"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Mzk4MTA3NTY5MjE1NjI5NDYsImp0aSI6IjYwZjY5N2Y1Y2JjOTU5MDAwMTI5MGI5ZCIsImlhdCI6MTYzNzIxODc1NjkyMTU2Mjg1NiwiaXNzIjoiaWFtLnJjcmFpLmNvbSJ9.7zQLS3v7lrMPnTd151QkQ1mg-xnZxMgZlj_UCzkqRa0"}
+
+'
