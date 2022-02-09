@@ -3,6 +3,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/link1st/go-stress-testing/scenes/http_scenes"
 	"sync"
 	"time"
 
@@ -31,12 +32,13 @@ func init() {
 }
 
 // Dispose 处理函数
-func Dispose(concurrency, totalNumber uint64, request *model.Request) {
+func Dispose(concurrency, totalNumber uint64, caseName string, request *model.Request) {
 	// 设置接收数据缓存
 	ch := make(chan *model.RequestResults, 1000)
 	var (
-		wg          sync.WaitGroup // 发送数据完成
-		wgReceiving sync.WaitGroup // 数据处理完成
+		wg          sync.WaitGroup   // 发送数据完成
+		wgReceiving sync.WaitGroup   // 数据处理完成
+		requestList []*model.Request //压测用例
 	)
 	wgReceiving.Add(1)
 	go statistics.ReceivingResults(concurrency, ch, &wgReceiving)
@@ -44,12 +46,28 @@ func Dispose(concurrency, totalNumber uint64, request *model.Request) {
 	if request.Keepalive {
 		httplongclinet.CreateLangHttpClient(request)
 	}
+	//整合请求API数据
+	if caseName == "" {
+		requestList = append(requestList, request)
+	} else {
+		value, ok := http_scenes.GetReqListScenes(caseName)
+		if !ok || value == nil {
+			return
+		}
+
+		requestList = value
+	}
+
+	for _, m := range requestList {
+		m.Print()
+		fmt.Println("------------------------step分割线------------------------")
+	}
 
 	for i := uint64(0); i < concurrency; i++ {
 		wg.Add(1)
 		switch request.Form {
 		case model.FormTypeHTTP:
-			go golink.HTTP(i, ch, totalNumber, &wg, request)
+			go golink.HTTP(i, ch, totalNumber, &wg, requestList)
 		case model.FormTypeWebSocket:
 			switch connectionMode {
 			case 1:

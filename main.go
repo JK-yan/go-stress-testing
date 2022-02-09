@@ -27,18 +27,19 @@ func (a *array) Set(s string) error {
 }
 
 var (
-	concurrency uint64  = 1       // 并发数
-	totalNumber uint64  = 1       // 请求数(单个并发/协程)
-	debugStr            = "false" // 是否是debug
-	requestURL          = ""      // 压测的url 目前支持，http/https ws/wss
-	path                = ""      // curl文件路径 http接口压测，自定义参数设置
-	verify              = ""      // verify 验证方法 在server/verify中 http 支持:statusCode、json webSocket支持:json
-	headers     array             // 自定义头信息传递给服务器
-	body        = ""              // HTTP POST方式传送数据
-	maxCon      = 1               // 单个连接最大请求数
-	code        = 200             //成功状态码
-	http2       = false           // 是否开http2.0
-	keepalive   = false           // 是否开启长连接
+	concurrency uint64    = 1       // 并发数
+	totalNumber uint64    = 1       // 请求数(单个并发/协程)
+	debugStr              = "false" // 是否是debug
+	requestURL            = ""      // 压测的url 目前支持，http/https ws/wss
+	path                  = ""      // curl文件路径 http接口压测，自定义参数设置
+	verify                = ""      // verify 验证方法 在server/verify中 http 支持:statusCode、json webSocket支持:json
+	headers     array               // 自定义头信息传递给服务器
+	body        = ""                // HTTP POST方式传送数据
+	maxCon      = 1                 // 单个连接最大请求数
+	code        = 200               //成功状态码
+	http2       = false             // 是否开http2.0
+	keepalive   = false             // 是否开启长连接
+	caseName    = "login"           //需要压测的case名
 )
 
 func init() {
@@ -54,6 +55,7 @@ func init() {
 	flag.IntVar(&code, "code", code, "请求成功的状态码")
 	flag.BoolVar(&http2, "http2", http2, "是否开http2.0")
 	flag.BoolVar(&keepalive, "k", keepalive, "是否开启长连接")
+	flag.StringVar(&caseName, "name", caseName, "需要压测的case名")
 	// 解析参数
 	flag.Parse()
 }
@@ -62,14 +64,22 @@ func init() {
 // 编译可执行文件
 //go:generate go build main.go
 func main() {
-	runtime.GOMAXPROCS(1)
-	if concurrency == 0 || totalNumber == 0 || (requestURL == "" && path == "") {
+	if concurrency == 0 || totalNumber == 0 || (requestURL == "" && path == "" && caseName == "") {
+		fmt.Printf("压测地址或curl路径或caseName必填 \n")
+		fmt.Printf("压测地址或curl路径或caseName必填 \n")
 		fmt.Printf("示例: go run main.go -c 1 -n 1 -u https://www.baidu.com/ \n")
-		fmt.Printf("压测地址或curl路径必填 \n")
 		fmt.Printf("当前请求参数: -c %d -n %d -d %v -u %s \n", concurrency, totalNumber, debugStr, requestURL)
+		fmt.Printf("使用参数详解: \n")
 		flag.Usage()
 		return
 	}
+	if (path != "" && requestURL != "") || (path != "" && caseName != "") || (requestURL != "" && caseName != "") {
+		fmt.Println("压测时只能支持一种模式：path or requestURL or caseName ")
+		return
+	}
+	cupN := runtime.NumCPU()
+	fmt.Printf("当前操作系统共有CPU %d \n", cupN)
+	runtime.GOMAXPROCS(cupN)
 	debug := strings.ToLower(debugStr) == "true"
 	request, err := model.NewRequest(requestURL, verify, code, 0, debug, path, headers, body, maxCon, http2, keepalive)
 	if err != nil {
@@ -77,8 +87,8 @@ func main() {
 		return
 	}
 	fmt.Printf("\n 开始启动  并发数:%d 请求数:%d 请求参数: \n", concurrency, totalNumber)
-	request.Print()
+	//request.Print()
 	// 开始处理
-	server.Dispose(concurrency, totalNumber, request)
+	server.Dispose(concurrency, totalNumber, caseName, request)
 	return
 }
