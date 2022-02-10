@@ -3,13 +3,23 @@ package tools
 import (
 	"fmt"
 	"github.com/link1st/go-stress-testing/model"
+	"reflect"
 	"strings"
 )
 
-func replaceStringVariables(str string, m map[string]interface{}) string {
+func ReplaceStringVariables(str string, m map[string]interface{}) string {
 	if strings.Contains(str, "$") {
 		for k, v := range m {
-			str = strings.Replace(str, fmt.Sprint("$", k), v.(string), -1)
+			strValue := v.(string)
+			if strings.HasPrefix(strValue, "$") && strings.HasSuffix(strValue, "()") {
+				funcName := strValue[1:strings.Index(strValue, "(")]
+				if f, ok := Functions[funcName]; ok {
+					value := CallBackFunc(f)
+					strValue = value
+				}
+				continue
+			}
+			str = strings.Replace(str, fmt.Sprint("$", k), strValue, -1)
 		}
 	}
 	return str
@@ -23,10 +33,15 @@ func replaceMapVariables(va map[string]string, m map[string]interface{}) map[str
 	}
 	return va
 }
+func CallBackFunc(i interface{}) string {
+	var args []reflect.Value
+	fn := reflect.ValueOf(i)
+	return fmt.Sprintf("%v", fn.Call(args)[0])
+}
 
 func RequestFormat(res *model.Request, m map[string]interface{}) *model.Request {
 	request := &model.Request{
-		URL:       replaceStringVariables(res.URL, m),
+		URL:       ReplaceStringVariables(res.URL, m),
 		Form:      res.Form,
 		Method:    res.Method,
 		Headers:   replaceMapVariables(res.Headers, m),
