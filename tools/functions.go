@@ -1,12 +1,14 @@
 package tools
 
 import (
+	uuid "github.com/satori/go.uuid"
 	"math/rand"
 	"time"
 )
 
 var Functions = map[string]interface{}{
 	"get_timestamp": getTimestamp, // call without arguments
+	"get_uuid":      getUUID,
 }
 
 func init() {
@@ -14,6 +16,9 @@ func init() {
 }
 func getTimestamp() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
+}
+func getUUID() uuid.UUID {
+	return uuid.NewV4()
 }
 
 // MergeMap 以master 为主合并second。

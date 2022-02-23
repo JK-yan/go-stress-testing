@@ -17,7 +17,7 @@ func ReplaceStringVariables(str string, m map[string]interface{}) string {
 					value := CallBackFunc(f)
 					strValue = value
 				}
-				continue
+
 			}
 			str = strings.Replace(str, fmt.Sprint("$", k), strValue, -1)
 		}
@@ -45,7 +45,7 @@ func RequestFormat(res *model.Request, m map[string]interface{}) *model.Request 
 		Form:      res.Form,
 		Method:    res.Method,
 		Headers:   replaceMapVariables(res.Headers, m),
-		Body:      res.Body,
+		Body:      ReplaceStringVariables(res.Body, m),
 		Verify:    res.Verify,
 		Timeout:   res.Timeout,
 		Debug:     res.Debug,

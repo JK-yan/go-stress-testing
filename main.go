@@ -27,19 +27,19 @@ func (a *array) Set(s string) error {
 }
 
 var (
-	concurrency uint64    = 1       // 并发数
-	totalNumber uint64    = 1       // 请求数(单个并发/协程)
-	debugStr              = "false" // 是否是debug
-	requestURL            = ""      // 压测的url 目前支持，http/https ws/wss
-	path                  = ""      // curl文件路径 http接口压测，自定义参数设置
-	verify                = ""      // verify 验证方法 在server/verify中 http 支持:statusCode、json webSocket支持:json
-	headers     array               // 自定义头信息传递给服务器
-	body        = ""                // HTTP POST方式传送数据
-	maxCon      = 1                 // 单个连接最大请求数
-	code        = 200               //成功状态码
-	http2       = false             // 是否开http2.0
-	keepalive   = false             // 是否开启长连接
-	caseName    = "login"           //需要压测的case名
+	concurrency uint64      = 1       // 并发数
+	totalNumber uint64      = 1       // 请求数(单个并发/协程)
+	debugStr                = "false" // 是否是debug
+	requestURL              = ""      // 压测的url 目前支持，http/https ws/wss
+	path                    = ""      // curl文件路径 http接口压测，自定义参数设置
+	verify                  = ""      // verify 验证方法 在server/verify中 http 支持:statusCode、json webSocket支持:json
+	headers     array                 // 自定义头信息传递给服务器
+	body        = ""                  // HTTP POST方式传送数据
+	maxCon      = 1                   // 单个连接最大请求数
+	code        = 200                 //成功状态码
+	http2       = false               // 是否开http2.0
+	keepalive   = false               // 是否开启长连接
+	caseName    = "cdp_bug"           //需要压测的case名
 )
 
 func init() {
