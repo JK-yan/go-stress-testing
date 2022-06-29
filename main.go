@@ -4,11 +4,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"runtime"
-	"strings"
-
 	"github.com/link1st/go-stress-testing/model"
 	"github.com/link1st/go-stress-testing/server"
+	"runtime"
 )
 
 // array 自定义数组参数
@@ -27,25 +25,25 @@ func (a *array) Set(s string) error {
 }
 
 var (
-	concurrency uint64      = 1       // 并发数
-	totalNumber uint64      = 1       // 请求数(单个并发/协程)
-	debugStr                = "false" // 是否是debug
-	requestURL              = ""      // 压测的url 目前支持，http/https ws/wss
-	path                    = ""      // curl文件路径 http接口压测，自定义参数设置
-	verify                  = ""      // verify 验证方法 在server/verify中 http 支持:statusCode、json webSocket支持:json
-	headers     array                 // 自定义头信息传递给服务器
-	body        = ""                  // HTTP POST方式传送数据
-	maxCon      = 1                   // 单个连接最大请求数
-	code        = 200                 //成功状态码
-	http2       = false               // 是否开http2.0
-	keepalive   = false               // 是否开启长连接
-	caseName    = "cdp_bug"           //需要压测的case名
+	concurrency uint64    = 10    // 并发数
+	totalNumber uint64    = 10    // 请求数(单个并发/协程)
+	debugStr              = false // 是否是debug
+	requestURL            = ""    // 压测的url 目前支持，http/https ws/wss
+	path                  = ""    // curl文件路径 http接口压测，自定义参数设置
+	verify                = ""    // verify 验证方法 在server/verify中 http 支持:statusCode、json webSocket支持:json
+	headers     array             // 自定义头信息传递给服务器
+	body        = ""              // HTTP POST方式传送数据
+	maxCon      = 1               // 单个连接最大请求数
+	code        = 200             //成功状态码
+	http2       = false           // 是否开http2.0
+	keepalive   = false           // 是否开启长连接
+	caseName    = "login"         //需要压测的case名
 )
 
 func init() {
 	flag.Uint64Var(&concurrency, "c", concurrency, "并发数")
 	flag.Uint64Var(&totalNumber, "n", totalNumber, "请求数(单个并发/协程)")
-	flag.StringVar(&debugStr, "d", debugStr, "调试模式")
+	flag.BoolVar(&debugStr, "d", debugStr, "调试模式")
 	flag.StringVar(&requestURL, "u", requestURL, "压测地址")
 	flag.StringVar(&path, "p", path, "curl文件路径")
 	flag.StringVar(&verify, "v", verify, "验证方法 http 支持:statusCode、json webSocket支持:json")
@@ -61,7 +59,7 @@ func init() {
 }
 
 // main go 实现的压测工具
-// 编译可执行文件
+// 编译可执行文件  GOOS=linux GOARCH=amd64 go build main.go
 //go:generate go build main.go
 func main() {
 	if concurrency == 0 || totalNumber == 0 || (requestURL == "" && path == "" && caseName == "") {
@@ -80,7 +78,7 @@ func main() {
 	cupN := runtime.NumCPU()
 	fmt.Printf("当前操作系统共有CPU %d \n", cupN)
 	runtime.GOMAXPROCS(cupN)
-	debug := strings.ToLower(debugStr) == "true"
+	debug := debugStr == true
 	request, err := model.NewRequest(requestURL, verify, code, 0, debug, path, headers, body, maxCon, http2, keepalive)
 	if err != nil {
 		fmt.Printf("参数不合法 %v \n", err)

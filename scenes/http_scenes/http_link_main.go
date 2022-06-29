@@ -53,15 +53,15 @@ func (f StepByStepRequest) send(request *model.Request) (bool, int, uint64, int6
 		respStep      []byte
 	)
 	//newRequest := getRequest(request)
-	if request.Variables != nil {
+	request.Variables = tools.MergeMap(request.Variables, f.localVariables)
+
+	if len(request.Variables) != 0 {
 		//以request 的参数为准合并extract 的数据
-		request.Variables = tools.MergeMap(request.Variables, f.localVariables)
 		request = tools.RequestFormat(request, request.Variables)
 	}
-
 	resp, requestTime, err = client.HTTPRequest(request)
 	//提取接口返回结果的参数
-	if request.Extract != nil {
+	if len(request.Extract) != 0 {
 		respStep, err = ioutil.ReadAll(ioutil.NopCloser(resp.Body))
 		for k, v := range request.Extract {
 			va, _ := extractValue(respStep, v)
