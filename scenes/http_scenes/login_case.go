@@ -10,7 +10,7 @@ func init() {
 	clients := make([]*model.Request, 0)
 	// 压测第一步
 	clients = append(clients, &model.Request{
-		URL:    "http://debug.rcrai-staging.rcrai.com/zeus-iam/v1/login", // 请求url
+		URL:    "http://127.0.0.1/v1/login", // 请求url
 		Form:   "http",                                                   // 请求方式 示例参数:http/webSocket/tcp
 		Method: "POST",                                                   // 请求方法 示例参数:GET/POST/PUT
 		Headers: map[string]string{
@@ -27,7 +27,7 @@ func init() {
 	})
 	// 压测第二步
 	clients = append(clients, &model.Request{
-		URL:    "http://debug.rcrai-staging.rcrai.com/zeus-iam/v1/token/$accessToken", // 请求url
+		URL:    "http://127.0.0.1/v1/token/$accessToken", // 请求url
 		Form:   "http",                                                                // 请求方式 示例参数:http/webSocket/tcp
 		Method: "GET",                                                                 // 请求方法 示例参数:GET/POST/PUT
 		Headers: map[string]string{
