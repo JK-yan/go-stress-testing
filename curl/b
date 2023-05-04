@@ -1,0 +1,3 @@
+curl --location --request POST 'https://open.feishu.cn/open-apis/bot/v2/hook/ff21cfa2-d2ce-4bac-bf50-9c98aede1d3b' \
+--header 'Content-Type: application/json' \
+--data-raw '{"msg_type":"text","content":{"text":"request example"}}'

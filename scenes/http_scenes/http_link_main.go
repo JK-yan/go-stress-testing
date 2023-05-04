@@ -7,6 +7,7 @@ import (
 	"github.com/link1st/go-stress-testing/server/client"
 	"github.com/link1st/go-stress-testing/tools"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -60,6 +61,13 @@ func (f StepByStepRequest) send(request *model.Request) (bool, int, uint64, int6
 		request = tools.RequestFormat(request, request.Variables)
 	}
 	resp, requestTime, err = client.HTTPRequest(request)
+	if resp.StatusCode == 400 {
+		respStep, err = ioutil.ReadAll(ioutil.NopCloser(resp.Body))
+		if err != nil {
+			return false, 0, 0, 0
+		}
+		log.Printf(string(respStep))
+	}
 	//提取接口返回结果的参数
 	if len(request.Extract) != 0 {
 		respStep, err = ioutil.ReadAll(ioutil.NopCloser(resp.Body))
@@ -73,7 +81,9 @@ func (f StepByStepRequest) send(request *model.Request) (bool, int, uint64, int6
 	} else {
 		contentLength = resp.ContentLength
 		// 验证请求是否成功
+		//model.RegisterVerifyHTTP(request.Verify, verify.HTTPStatusCode)
 		errCode, isSucceed = request.GetVerifyHTTP()(request, resp)
+
 	}
 
 	return isSucceed, errCode, requestTime, contentLength

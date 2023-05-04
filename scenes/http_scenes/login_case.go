@@ -10,16 +10,16 @@ func init() {
 	clients := make([]*model.Request, 0)
 	// 压测第一步
 	clients = append(clients, &model.Request{
-		URL:    "http://127.0.0.1/v1/login", // 请求url
-		Form:   "http",                                                   // 请求方式 示例参数:http/webSocket/tcp
-		Method: "POST",                                                   // 请求方法 示例参数:GET/POST/PUT
+		URL:    "http://172.16.0.108/iam/v1/login", // 请求url
+		Form:   "http",                             // 请求方式 示例参数:http/webSocket/tcp
+		Method: "POST",                             // 请求方法 示例参数:GET/POST/PUT
 		Headers: map[string]string{
 			"Rcrai-Bid": "60f697f4cbc9590001290b99",
 		}, // headers 头信息
 		Body:    "{\"password\":\"1234qwerASDF!@#$\",\"email\":\"jichufuwu@rcrai.com\"}",
 		Verify:  "statusCode",     // 验证的方法 示例参数:statusCode、json
 		Timeout: 30 * time.Second, // 是否开启Debug模式
-		Debug:   false,            // 是否开启Debug模式
+		Debug:   true,             // 是否开启Debug模式
 		Code:    200,
 		Extract: map[string]string{
 			"accessToken": "token.accessToken",
@@ -35,7 +35,8 @@ func init() {
 		}, // headers 头信息
 		Verify:    "statusCode",     // 验证的方法 示例参数:statusCode、json
 		Timeout:   30 * time.Second, // 是否开启Debug模式
-		Debug:     false,            // 是否开启Debug模式
+		Debug:     true,             // 是否开启Debug模式
+		Code:      200,
 		Variables: map[string]interface{}{},
 	})
 	ReqListScenes["login"] = clients
